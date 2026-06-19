@@ -1,0 +1,50 @@
+{
+  "reminder_advance_minutes": 15,
+  "reminder_sound": true,
+  "reminder_popup": true,
+  "reminder_tray_flash": true,
+  "theme": "dark",
+  "auto_start": false,
+  "peer_board_enabled": false,
+  "check_in_time": "08:30",
+  "evening_study_start": "19:00",
+  "evening_study_end": "21:30",
+  "wake_up_time": "07:00",
+  "habits": [
+    {
+      "index": 0,
+      "name": "拒绝睡懒觉",
+      "icon": "bed"
+    },
+    {
+      "index": 1,
+      "name": "拒绝为了女朋友请假",
+      "icon": "heart"
+    },
+    {
+      "index": 2,
+      "name": "拒绝晚自习下课即跑",
+      "icon": "run"
+    },
+    {
+      "index": 3,
+      "name": "拒绝不交作业",
+      "icon": "book"
+    },
+    {
+      "index": 4,
+      "name": "拒绝打游戏、看游戏",
+      "icon": "game"
+    },
+    {
+      "index": 5,
+      "name": "拒绝离不开手机",
+      "icon": "phone"
+    }
+  ],
+  "window_position": {
+    "x": 100,
+    "y": 100
+  },
+  "window_collapsed": false
+}
