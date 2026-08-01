@@ -47,6 +47,8 @@ class ReminderEngine(QObject):
                 continue
             
             start_time = course[5]  # start_time
+            course_type = course[4]  # course_type
+            is_self_study = course[9] if len(course) > 9 else False
             if not start_time:
                 continue
             
@@ -58,11 +60,21 @@ class ReminderEngine(QObject):
             reminder_key = f"course_{course[0]}_{reminder_time}"
             if current_time == reminder_time and reminder_key not in self.triggered_today:
                 self.triggered_today.add(reminder_key)
+                
+                if is_self_study:
+                    description = f'自习时间到！请自觉学习，每隔一小时休息10分钟'
+                elif course_type == 'lecture':
+                    description = f'讲师课程即将开始，请准备好笔记本和学习用品'
+                elif course_type == 'self_study':
+                    description = f'自习时间到！请自觉学习，每隔一小时休息10分钟'
+                else:
+                    description = f'课程即将开始，请做好准备'
+                
                 self.reminder_triggered.emit({
                     'type': 'course',
                     'title': course[3],  # title
                     'time': start_time,
-                    'description': f'课程即将开始，请做好准备',
+                    'description': description,
                     'priority': 'normal'
                 })
     
@@ -80,7 +92,7 @@ class ReminderEngine(QObject):
                 })
     
     def _check_evening_review(self, today_str, current_time):
-        evening_end = config.get('evening_study_end', '21:30')
+        evening_end = config.get('evening_study_end', '22:30')
         if current_time == evening_end:
             reminder_key = f"evening_review_{today_str}"
             if reminder_key not in self.triggered_today:
@@ -89,7 +101,7 @@ class ReminderEngine(QObject):
                     'type': 'review',
                     'title': '每日学习复盘',
                     'time': evening_end,
-                    'description': '晚自习结束了，来记录今天的收获吧！',
+                    'description': '晚自习结束了！请完成今日学习复盘：1. 今日学到了什么？2. 有哪些问题需要解决？3. 明日学习计划是什么？',
                     'priority': 'high'
                 })
     

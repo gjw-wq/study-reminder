@@ -1,0 +1,158 @@
+name: 构建学习纪律官
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  # ============================================================
+  #  macOS 打包（生成 .app 和 .dmg）
+  # ============================================================
+  build-macos:
+    name: macOS 打包
+    runs-on: macos-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir PyQt6 Pillow pyinstaller
+
+      - name: 确保资源文件夹存在
+        run: |
+          mkdir -p data assets icons
+          echo "资源文件夹检查完成"
+          ls -la
+
+      - name: 转换图标为 macOS 格式 (.icns)
+        run: |
+          # 创建 iconset 文件夹
+          mkdir -p icons/app.iconset
+
+          # 用 Python 从 ico 中提取不同尺寸的 png
+          python - << 'EOF'
+          from PIL import Image
+          import os
+
+          ico_path = 'icons/app.ico'
+          iconset_dir = 'icons/app.iconset'
+
+          # 读取 ico 文件中的所有尺寸
+          icon = Image.open(ico_path)
+          sizes = [16, 32, 64, 128, 256, 512]
+
+          for size in sizes:
+              # 普通尺寸
+              img = icon.resize((size, size), Image.LANCZOS)
+              img.save(os.path.join(iconset_dir, f'icon_{size}x{size}.png'))
+              # 2x 尺寸（Retina 屏）
+              img_2x = icon.resize((size * 2, size * 2), Image.LANCZOS)
+              img_2x.save(os.path.join(iconset_dir, f'icon_{size}x{size}@2x.png'))
+
+          print('图标尺寸生成完成')
+          EOF
+
+          # 转换成 .icns
+          iconutil -c icns icons/app.iconset -o icons/app.icns
+          echo "图标转换完成: icons/app.icns"
+
+      - name: 用 PyInstaller 打包
+        run: |
+          pyinstaller --windowed --onefile \
+            --name "学习纪律官" \
+            --icon="icons/app.icns" \
+            --add-data "data:data" \
+            --add-data "assets:assets" \
+            --add-data "icons:icons" \
+            --hidden-import "PyQt6.QtWidgets" \
+            --hidden-import "PyQt6.QtCore" \
+            --hidden-import "PyQt6.QtGui" \
+            --hidden-import "PyQt6.QtSql" \
+            main.py
+
+      - name: 创建 DMG 安装包
+        run: |
+          # 创建 DMG 临时目录
+          mkdir -p dist/dmg-root
+          cp -R "dist/学习纪律官.app" dist/dmg-root/
+          
+          # 创建 Applications 快捷方式
+          ln -s /Applications dist/dmg-root/Applications
+          
+          # 用 hdiutil 创建 DMG（macOS 自带命令，最可靠）
+          hdiutil create \
+            -volname "学习纪律官" \
+            -srcfolder dist/dmg-root \
+            -ov -format UDZO \
+            -imagekey zlib-level=9 \
+            "dist/学习纪律官.dmg"
+          
+          # 清理临时目录
+          rm -rf dist/dmg-root
+          echo "DMG 创建完成: dist/学习纪律官.dmg"
+
+      - name: 上传 macOS 打包产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: 学习纪律官-macOS
+          path: |
+            dist/学习纪律官.app
+            dist/学习纪律官.dmg
+
+  # ============================================================
+  #  Windows 打包（生成 .exe）
+  # ============================================================
+  build-windows:
+    name: Windows 打包
+    runs-on: windows-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir PyQt6 Pillow pyinstaller
+
+      - name: 确保资源文件夹存在
+        run: |
+          New-Item -ItemType Directory -Force -Path data, assets, icons
+          echo "资源文件夹检查完成"
+          Get-ChildItem
+
+      - name: 用 PyInstaller 打包
+        run: |
+          pyinstaller --windowed --onefile `
+            --name "学习纪律官" `
+            --icon="icons/app.ico" `
+            --add-data "data;data" `
+            --add-data "assets;assets" `
+            --add-data "icons;icons" `
+            --hidden-import "PyQt6.QtWidgets" `
+            --hidden-import "PyQt6.QtCore" `
+            --hidden-import "PyQt6.QtGui" `
+            --hidden-import "PyQt6.QtSql" `
+            main.py
+
+      - name: 上传 Windows 打包产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: 学习纪律官-Windows
+          path: dist/学习纪律官.exe

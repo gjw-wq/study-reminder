@@ -135,6 +135,7 @@ class ReminderPopup(QWidget):
             'routine': '作息提醒',
             'course_start': '课程开始',
             'evening_start': '晚自习',
+            'evening_mid': '晚自习环节',
             'evening_end': '晚自习结束',
             'review': '每日复盘'
         }

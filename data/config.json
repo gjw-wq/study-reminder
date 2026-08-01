@@ -3,7 +3,7 @@
   "reminder_sound": true,
   "reminder_popup": true,
   "reminder_tray_flash": true,
-  "theme": "dark",
+  "theme": "light",
   "auto_start": false,
   "peer_board_enabled": false,
   "check_in_time": "08:30",

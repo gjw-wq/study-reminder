@@ -147,6 +147,24 @@ python build.py
 # 输出文件：dist/学习纪律官.exe
 ```
 
+> **重要提示：关闭UPX压缩**
+>
+> 如果打包后运行报 `DLL load failed while importing QtWidgets`，原因是 UPX 压缩后的 DLL 在解压到临时目录时因路径或权限问题导致加载失败。解决方法：将 `.spec` 文件中的 `upx=True` 改为 `upx=False`，然后重新打包。
+>
+> 完整操作命令：
+> ```powershell
+> # 先关闭UPX
+> python -c "
+> with open('学习纪律官.spec', 'r', encoding='utf-8') as f:
+>     content = f.read()
+> content = content.replace('upx=True', 'upx=False')
+> with open('学习纪律官.spec', 'w', encoding='utf-8') as f:
+>     f.write(content)
+> "
+> # 再执行打包
+> python -m PyInstaller --noconfirm --clean "学习纪律官.spec"
+> ```
+
 ---
 
 ## 常见问题

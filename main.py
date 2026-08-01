@@ -2,7 +2,10 @@ import sys
 import os
 import traceback
 
-# 添加项目根目录到路径（开发环境需要，打包后PyInstaller自动处理）
+if hasattr(sys, '_MEIPASS'):
+    os.environ['PATH'] = os.path.join(sys._MEIPASS, 'PyQt6', 'Qt6', 'bin') + os.pathsep + os.environ['PATH']
+    os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = os.path.join(sys._MEIPASS, 'PyQt6', 'Qt6', 'plugins', 'platforms')
+
 _project_root = os.path.dirname(os.path.abspath(__file__))
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)

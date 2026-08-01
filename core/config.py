@@ -19,9 +19,9 @@ DEFAULT_CONFIG = {
     'theme': 'dark',
     'auto_start': False,
     'peer_board_enabled': False,
-    'check_in_time': '08:30',
-    'evening_study_start': '19:00',
-    'evening_study_end': '21:30',
+    'check_in_time': '08:25',
+    'evening_study_start': '19:25',
+    'evening_study_end': '22:30',
     'wake_up_time': '07:00',
     'habits': [
         {'index': 0, 'name': '拒绝睡懒觉', 'icon': 'bed'},
