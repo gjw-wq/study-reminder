@@ -37,3 +37,6 @@ data/*.json
 
 # PyInstaller
 *.spec
+
+# Build artifacts
+dist.zip
